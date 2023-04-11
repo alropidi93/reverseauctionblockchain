@@ -2,6 +2,7 @@ package com.picho.reverseauctionblockchain.service.impl;
 
 import com.picho.reverseauctionblockchain.dao.RabUserDAO;
 import com.picho.reverseauctionblockchain.dao.RoleDAO;
+import com.picho.reverseauctionblockchain.dto.RabUserRegistrationForm;
 import com.picho.reverseauctionblockchain.model.RabUser;
 import com.picho.reverseauctionblockchain.model.Role;
 import com.picho.reverseauctionblockchain.service.RabUserService;
@@ -31,8 +32,12 @@ public class RabUserServiceImpl implements RabUserService, UserDetailsService {
     PasswordEncoder passwordEncoder;
 
     @Override
-    public RabUser saveUser(RabUser user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public RabUser saveUser(RabUserRegistrationForm userForm) {
+        RabUser user = new RabUser();
+        user.setUsername(userForm.getUsername());
+        user.setPassword(passwordEncoder.encode(userForm.getPassword()));
+        user.setFullname(userForm.getFullname());
+
         return rabUserDAO.save(user);
 
     }

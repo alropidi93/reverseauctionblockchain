@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -18,9 +19,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,16 +47,18 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
+
         String authorizationData = request.getHeader("Authorization");
+        log.info(authorizationData);
         String pair = new String(Base64.decodeBase64(authorizationData.substring(6)));
         String username=pair.split(":")[0];
         String password=pair.split(":")[1];
-        //String username = request.getParameter("username");
-        //String password = request.getParameter("password");
         log.info("Username: {} Password: {}", username,password);
         UsernamePasswordAuthenticationToken authenticationToken =  new UsernamePasswordAuthenticationToken(username,password);
 
         return authenticationManager.authenticate(authenticationToken);
+
+
 
     }
 
@@ -77,6 +82,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         tokens.put("access_token",access_token);
         tokens.put("refresh_token", refresh_token);
         response.setContentType(APPLICATION_JSON_VALUE);
+        Cookie cookie = new Cookie("Authorization",   URLEncoder.encode( "Bearer " + access_token, "UTF-8" ));
+        response.addCookie(cookie);
+        response.setHeader("Authorization","Bearer " + access_token);
         new ObjectMapper().writeValue(response.getOutputStream(),tokens);
     }
 
