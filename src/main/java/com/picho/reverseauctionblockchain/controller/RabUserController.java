@@ -41,7 +41,7 @@ public class RabUserController {
 
     @GetMapping("/test")
     public ResponseEntity<Object> test(){
-        return ResponseEntity.ok().body("prueba".toString());
+        return ResponseEntity.ok().body("prueba jeje".toString());
     }
 
     @GetMapping("/users")
