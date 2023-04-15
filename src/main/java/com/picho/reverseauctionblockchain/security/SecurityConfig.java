@@ -58,7 +58,7 @@ public class SecurityConfig {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
         customAuthenticationFilter.setFilterProcessesUrl("/api/login"); //es para que esa ruta vaya a la autenticacion
         http.authorizeHttpRequests().antMatchers("/api/login/**","/api/token/refresh/**").permitAll();
-        http.authorizeHttpRequests().antMatchers(GET,"/api/users/**").hasAnyAuthority("PROVEEDOR");
+        http.authorizeHttpRequests().antMatchers(GET,"/api/users/**").hasAnyAuthority("ROLE_ADMIN");
         /*http.authorizeHttpRequests().antMatchers(POST,"/api/role/save/**").hasAnyAuthority("ROLE_ADMIN","ROLE_TECHNICAL");
         http.authorizeHttpRequests().anyRequest().authenticated();*/
         http.addFilter(customAuthenticationFilter);

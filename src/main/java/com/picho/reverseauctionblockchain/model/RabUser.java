@@ -14,6 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RabUser {
+
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "idUser", nullable = false)
