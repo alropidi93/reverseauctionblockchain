@@ -9,11 +9,14 @@ import com.picho.reverseauctionblockchain.service.RabUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -62,7 +65,11 @@ public class RabUserServiceImpl implements RabUserService, UserDetailsService {
 
     @Override
     public List<RabUser> getUsers() {
-        return rabUserDAO.findAll();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        System.out.println("Authenticated username: " + currentPrincipalName);
+        List<RabUser> list =  rabUserDAO.findAll();
+        return list;
     }
 
     @Override

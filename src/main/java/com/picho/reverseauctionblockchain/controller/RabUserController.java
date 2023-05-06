@@ -46,6 +46,7 @@ public class RabUserController {
 
     @GetMapping("/users")
     public ResponseEntity<List<RabUser>>listUsers(){
+
         return ResponseEntity.ok().body(rabUserService.getUsers());
     }
 
