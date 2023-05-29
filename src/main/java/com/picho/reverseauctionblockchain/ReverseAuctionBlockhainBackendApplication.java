@@ -29,7 +29,7 @@ public class ReverseAuctionBlockhainBackendApplication {
 	CommandLineRunner run(RabUserService rabUserService){
         return args -> {
 
-			rabUserService.saveRole(new Role("ROLE_ADMIN"));
+			/*rabUserService.saveRole(new Role("ROLE_ADMIN"));
 			rabUserService.saveRole(new Role("ROLE_SELLER"));
 			rabUserService.saveRole(new Role("ROLE_COLLECTOR"));
 			rabUserService.saveRole(new Role("ROLE_TECHNICAL"));
@@ -47,7 +47,7 @@ public class ReverseAuctionBlockhainBackendApplication {
 			rabUserService.addRoleToUser("pierina.picho","ROLE_COLLECTOR");
 			rabUserService.addRoleToUser("alonso.villon","ROLE_SELLER");
 			rabUserService.addRoleToUser("manuel.picho","ROLE_TECHNICAL");
-			rabUserService.addRoleToUser("manuel.picho","ROLE_COLLECTOR");
+			rabUserService.addRoleToUser("manuel.picho","ROLE_COLLECTOR");*/
         };
     }
 }

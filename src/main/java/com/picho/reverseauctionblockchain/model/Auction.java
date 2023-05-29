@@ -23,7 +23,24 @@ public class Auction {
     @Column(name = "name", unique = true, nullable = false, length = 200)
     private String name;
 
-    @Column(name = "procurement_type", unique = true, nullable = false, length = 200)
-    private Integer procurementType;
+    @Column(name = "description", nullable = true, length = 500)
+    private String description;
+
+    @Column(name = "state",  nullable = false)
+    private Integer state = 1;
+
+    @Column(name = "referenceValue",  nullable = true)
+    private Float referenceValue ;
+
+    @ManyToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name="idGoodService")
+    private GoodService goodService;
+
+    @ManyToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name="idStateEntity")
+    private RabUser stateEntity;
+
+
+
 
 }

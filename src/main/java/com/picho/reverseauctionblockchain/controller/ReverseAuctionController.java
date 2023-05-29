@@ -4,8 +4,10 @@ import com.picho.reverseauctionblockchain.dto.AuctionCreateForm;
 import com.picho.reverseauctionblockchain.dto.AuctionTestDTO;
 import com.picho.reverseauctionblockchain.dto.RabUserRegistrationForm;
 import com.picho.reverseauctionblockchain.model.Auction;
+import com.picho.reverseauctionblockchain.model.GoodService;
 import com.picho.reverseauctionblockchain.model.RabUser;
 import com.picho.reverseauctionblockchain.service.AuctionService;
+import com.picho.reverseauctionblockchain.service.GoodServiceService;
 import com.picho.reverseauctionblockchain.service.RabUserService;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,9 +32,12 @@ public class ReverseAuctionController {
     @Autowired
     AuctionService auctionService;
 
+    @Autowired
+    GoodServiceService goodServiceService;
+
     @GetMapping("/list")
     public ResponseEntity<List<AuctionTestDTO>> getAuctions() throws IOException, InterruptedException, JSONException {
-        String command = "curl -X GET http://localhost:5000/list-auctions";
+        String command = "curl -X GET http://localhost:5000/list-auctions -H \"Content-Type: application/json\"";
         ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
         Process pr = processBuilder.start();
         pr.waitFor();
@@ -62,9 +68,15 @@ public class ReverseAuctionController {
 
     @CrossOrigin
     @PostMapping(value = "/create")
-    public ResponseEntity<Auction>create(@RequestBody AuctionCreateForm auctionCreateform){
+    public ResponseEntity<Auction>create(@RequestBody AuctionCreateForm auctionCreateform) throws IOException, InterruptedException, JSONException, URISyntaxException {
 
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/reverseauction/create").toUriString());
         return ResponseEntity.created(uri).body(auctionService.saveAuction(auctionCreateform));
+    }
+
+    @GetMapping("/getGoodServices")
+    public ResponseEntity<List<GoodService>>getGoodServices(){
+
+        return ResponseEntity.ok().body(goodServiceService.getGoodServices());
     }
 }
