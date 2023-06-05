@@ -1,19 +1,26 @@
 package com.picho.reverseauctionblockchain.service.impl;
 
+import com.picho.reverseauctionblockchain.dao.BidderEntityDAO;
 import com.picho.reverseauctionblockchain.dao.RabUserDAO;
 import com.picho.reverseauctionblockchain.dao.RoleDAO;
+import com.picho.reverseauctionblockchain.dao.StateEntityDAO;
 import com.picho.reverseauctionblockchain.dto.RabUserRegistrationForm;
+import com.picho.reverseauctionblockchain.model.BidderEntity;
 import com.picho.reverseauctionblockchain.model.RabUser;
 import com.picho.reverseauctionblockchain.model.Role;
+import com.picho.reverseauctionblockchain.model.StateEntity;
 import com.picho.reverseauctionblockchain.service.RabUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -29,6 +36,12 @@ public class RabUserServiceImpl implements RabUserService, UserDetailsService {
     RoleDAO roleDAO;
 
     @Autowired
+    StateEntityDAO stateEntityDAO;
+
+    @Autowired
+    BidderEntityDAO bidderEntityDAO;
+
+    @Autowired
     PasswordEncoder passwordEncoder;
 
     @Override
@@ -37,7 +50,19 @@ public class RabUserServiceImpl implements RabUserService, UserDetailsService {
         user.setUsername(userForm.getUsername());
         user.setPassword(passwordEncoder.encode(userForm.getPassword()));
         user.setFullname(userForm.getFullname());
-
+        if (userForm.getRole().equals("ROLE_ENTITY")){
+            log.info("Buscando la entidad del estado");
+            StateEntity stateEntity =  stateEntityDAO.findByCode(userForm.getEntityCode());
+            user.setStateEntity(stateEntity);
+        }
+        else if (userForm.getRole().equals("ROLE_BIDDER")){
+            log.info("Buscando la entidad ofertante");
+            BidderEntity bidderEntity =  bidderEntityDAO.findByCode(userForm.getBidderCode());
+            user.setBidderEntity(bidderEntity);
+        }
+        log.info("Buscando el rol");
+        Role role = roleDAO.findByName(userForm.getRole());
+        user.getRoles().add(role);
         return rabUserDAO.save(user);
 
     }
@@ -62,7 +87,17 @@ public class RabUserServiceImpl implements RabUserService, UserDetailsService {
 
     @Override
     public List<RabUser> getUsers() {
-        return rabUserDAO.findAll();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        System.out.println("Authenticated username: " + currentPrincipalName);
+        List<RabUser> list =  rabUserDAO.findAll();
+        return list;
+    }
+
+    @Override
+    public RabUser getRabUserByStateEntityCode(String code) {
+        RabUser rabUser =  rabUserDAO.findByStateEntityCode (code);
+        return rabUser;
     }
 
     @Override

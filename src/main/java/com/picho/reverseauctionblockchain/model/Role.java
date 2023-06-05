@@ -12,6 +12,11 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role {
+
+    public Role(String roleName){
+        this.name = roleName;
+    }
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "idRole", nullable = false)

@@ -10,16 +10,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 import static org.springframework.http.HttpMethod.GET;
 
@@ -58,7 +54,7 @@ public class SecurityConfig {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
         customAuthenticationFilter.setFilterProcessesUrl("/api/login"); //es para que esa ruta vaya a la autenticacion
         http.authorizeHttpRequests().antMatchers("/api/login/**","/api/token/refresh/**").permitAll();
-        http.authorizeHttpRequests().antMatchers(GET,"/api/users/**").hasAnyAuthority("PROVEEDOR");
+        http.authorizeHttpRequests().antMatchers(GET,"/api/users/**").hasAnyAuthority("ROLE_ADMIN");
         /*http.authorizeHttpRequests().antMatchers(POST,"/api/role/save/**").hasAnyAuthority("ROLE_ADMIN","ROLE_TECHNICAL");
         http.authorizeHttpRequests().anyRequest().authenticated();*/
         http.addFilter(customAuthenticationFilter);

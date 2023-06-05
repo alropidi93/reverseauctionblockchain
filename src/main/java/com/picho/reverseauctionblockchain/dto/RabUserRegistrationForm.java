@@ -13,4 +13,8 @@ public class RabUserRegistrationForm {
     private String password;
     private String fullname;
 
+    private String role;
+    private String entityCode;
+    private String bidderCode;
+
 }

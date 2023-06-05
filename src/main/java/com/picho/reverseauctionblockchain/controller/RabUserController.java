@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.picho.reverseauctionblockchain.dto.RabUserRegistrationForm;
+import com.picho.reverseauctionblockchain.dto.UserInfoDTO;
 import com.picho.reverseauctionblockchain.model.RabUser;
 import com.picho.reverseauctionblockchain.model.Role;
 import com.picho.reverseauctionblockchain.service.RabUserService;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,11 +43,44 @@ public class RabUserController {
 
     @GetMapping("/test")
     public ResponseEntity<Object> test(){
-        return ResponseEntity.ok().body("prueba".toString());
+        return ResponseEntity.ok().body("Prueba desde get".toString());
+    }
+
+    @GetMapping("/user/info")
+    public ResponseEntity<Object> info(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        RabUser rabUser =  rabUserService.getUser(username);
+        UserInfoDTO userInfoDTO = new UserInfoDTO();
+        userInfoDTO.setUsername(rabUser.getUsername());
+        userInfoDTO.setFullname(rabUser.getFullname());
+        UserInfoDTO.EntityInfo entityInfo=null;
+        if (rabUser.getStateEntity() != null){
+            userInfoDTO.setRole("ROLE_ENTITY");
+            entityInfo  = new UserInfoDTO.StateEntityInfo();
+            entityInfo.setCode(rabUser.getStateEntity().getCode());
+            entityInfo.setName(rabUser.getStateEntity().getName());
+            ((UserInfoDTO.StateEntityInfo)entityInfo).setDescription(rabUser.getStateEntity().getDescription());
+
+
+        }
+        else if (rabUser.getBidderEntity() != null){
+            userInfoDTO.setRole("ROLE_BIDDER");
+            entityInfo = new UserInfoDTO.BidderEntityInfo();
+            entityInfo.setCode(rabUser.getBidderEntity().getCode());
+            entityInfo.setName(rabUser.getBidderEntity().getName());
+            ((UserInfoDTO.BidderEntityInfo)entityInfo).setRuc(rabUser.getBidderEntity().getRuc());
+
+        }
+        userInfoDTO.setEntityInfo(entityInfo);
+
+
+        return ResponseEntity.ok().body(userInfoDTO);
     }
 
     @GetMapping("/users")
     public ResponseEntity<List<RabUser>>listUsers(){
+
         return ResponseEntity.ok().body(rabUserService.getUsers());
     }
 

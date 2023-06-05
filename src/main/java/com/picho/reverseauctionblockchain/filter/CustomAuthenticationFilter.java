@@ -82,9 +82,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         tokens.put("access_token",access_token);
         tokens.put("refresh_token", refresh_token);
         response.setContentType(APPLICATION_JSON_VALUE);
-        Cookie cookie = new Cookie("Authorization",   URLEncoder.encode( "Bearer " + access_token, "UTF-8" ));
-        response.addCookie(cookie);
-        response.setHeader("Authorization","Bearer " + access_token);
+        //Cookie cookie = new Cookie("Authorization",   URLEncoder.encode( "Bearer " + access_token, "UTF-8" ));
+        //response.addCookie(cookie);
+        //response.setHeader("Authorization","Bearer " + access_token);
         new ObjectMapper().writeValue(response.getOutputStream(),tokens);
     }
 
