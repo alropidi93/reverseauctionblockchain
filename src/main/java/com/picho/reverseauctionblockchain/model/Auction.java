@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.swing.plaf.nimbus.State;
 
 @Entity
 @Table(name="auction")
@@ -36,9 +37,9 @@ public class Auction {
     @JoinColumn(name="idGoodService")
     private GoodService goodService;
 
-    @ManyToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name="idStateEntity")
-    private RabUser stateEntity;
+    private StateEntity stateEntity;
 
 
 

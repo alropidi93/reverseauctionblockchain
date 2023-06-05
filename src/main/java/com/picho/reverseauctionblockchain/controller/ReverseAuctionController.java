@@ -13,7 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -34,6 +37,9 @@ public class ReverseAuctionController {
 
     @Autowired
     GoodServiceService goodServiceService;
+
+    @Autowired
+    RabUserService rabUserService;
 
     @GetMapping("/list")
     public ResponseEntity<List<AuctionTestDTO>> getAuctions() throws IOException, InterruptedException, JSONException {
@@ -67,11 +73,21 @@ public class ReverseAuctionController {
     }
 
     @CrossOrigin
-    @PostMapping(value = "/create")
-    public ResponseEntity<Auction>create(@RequestBody AuctionCreateForm auctionCreateform) throws IOException, InterruptedException, JSONException, URISyntaxException {
+    @PostMapping(value = "/create/{entityCode}")
+    public ResponseEntity<Auction>create(@PathVariable String entityCode ,@RequestBody AuctionCreateForm auctionCreateform) throws IOException, InterruptedException, JSONException, URISyntaxException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        RabUser rabUser =  rabUserService.getRabUserByStateEntityCode(entityCode);
+        URI uri = null;
+        Auction auctionCreated = null;
+        if (rabUser.getUsername().equals(username)){
+            uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/reverseauction/create").toUriString());
+            auctionCreated =  auctionService.saveAuction(entityCode, auctionCreateform);
+            if (auctionCreated == null)
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
 
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/reverseauction/create").toUriString());
-        return ResponseEntity.created(uri).body(auctionService.saveAuction(auctionCreateform));
+        return ResponseEntity.created(uri).body(auctionCreated);
     }
 
     @GetMapping("/getGoodServices")

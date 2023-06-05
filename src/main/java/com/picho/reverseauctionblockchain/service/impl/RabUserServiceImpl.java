@@ -54,19 +54,15 @@ public class RabUserServiceImpl implements RabUserService, UserDetailsService {
             log.info("Buscando la entidad del estado");
             StateEntity stateEntity =  stateEntityDAO.findByCode(userForm.getEntityCode());
             user.setStateEntity(stateEntity);
-            log.info("Buscando el rol");
-            Role role = roleDAO.findByName(userForm.getRole());
-            user.getRoles().add(role);
         }
         else if (userForm.getRole().equals("ROLE_BIDDER")){
             log.info("Buscando la entidad ofertante");
             BidderEntity bidderEntity =  bidderEntityDAO.findByCode(userForm.getBidderCode());
             user.setBidderEntity(bidderEntity);
-            log.info("Buscando el rol");
-            Role role = roleDAO.findByName(userForm.getRole());
-            user.getRoles().add(role);
         }
-
+        log.info("Buscando el rol");
+        Role role = roleDAO.findByName(userForm.getRole());
+        user.getRoles().add(role);
         return rabUserDAO.save(user);
 
     }
@@ -96,6 +92,12 @@ public class RabUserServiceImpl implements RabUserService, UserDetailsService {
         System.out.println("Authenticated username: " + currentPrincipalName);
         List<RabUser> list =  rabUserDAO.findAll();
         return list;
+    }
+
+    @Override
+    public RabUser getRabUserByStateEntityCode(String code) {
+        RabUser rabUser =  rabUserDAO.findByStateEntityCode (code);
+        return rabUser;
     }
 
     @Override

@@ -23,6 +23,12 @@ public class GoodService {
     @Column(name = "name", nullable = false, length = 400)
     private String name;
 
+    @Column(name = "unitPrice", nullable = false)
+    private Float unitPrice;
+
+    @Column(name = "dimension", nullable = true, length = 20)
+    private String dimension;
+
     @Column(name = "procurementType",  nullable = false)
     private Integer procurementType;
 

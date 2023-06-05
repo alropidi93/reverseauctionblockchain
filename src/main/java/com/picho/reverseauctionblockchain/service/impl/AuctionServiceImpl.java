@@ -3,9 +3,11 @@ package com.picho.reverseauctionblockchain.service.impl;
 import com.picho.reverseauctionblockchain.dao.AuctionDAO;
 import com.picho.reverseauctionblockchain.dao.GoodServiceDAO;
 import com.picho.reverseauctionblockchain.dao.RabUserDAO;
+import com.picho.reverseauctionblockchain.dao.StateEntityDAO;
 import com.picho.reverseauctionblockchain.dto.AuctionCreateForm;
 import com.picho.reverseauctionblockchain.model.Auction;
 import com.picho.reverseauctionblockchain.model.GoodService;
+import com.picho.reverseauctionblockchain.model.StateEntity;
 import com.picho.reverseauctionblockchain.service.AuctionService;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -36,14 +38,19 @@ public class AuctionServiceImpl implements AuctionService {
     @Autowired
     GoodServiceDAO goodServiceDAO;
 
+    @Autowired
+    StateEntityDAO stateEntityDAO;
+
     @Override
-    public Auction saveAuction(AuctionCreateForm auctionCreateForm) throws IOException, InterruptedException, URISyntaxException, JSONException {
+    public Auction saveAuction(String entityCode, AuctionCreateForm auctionCreateForm) throws IOException, InterruptedException, URISyntaxException, JSONException {
         Auction auction = new Auction();
         auction.setCode(auctionCreateForm.getCode());
         auction.setName(auctionCreateForm.getName());
         auction.setReferenceValue(auctionCreateForm.getReferenceValue());
         auction.setDescription(auctionCreateForm.getDescription());
 
+        StateEntity stateEntity =  stateEntityDAO.findByCode(entityCode);
+        auction.setStateEntity(stateEntity);
         GoodService goodService = goodServiceDAO.findByCode(auctionCreateForm.getGoodServiceCode());
         auction.setGoodService(goodService);
         JSONObject data = new JSONObject();
@@ -60,17 +67,19 @@ public class AuctionServiceImpl implements AuctionService {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        Auction auctionCreated = null;
         if(response.statusCode() == HttpStatus.OK.value()){
             System.out.println("Se guardo en la blockchain");
             JSONObject responseJson = new JSONObject(response.body());
             System.out.println(responseJson.get("message"));
+            auctionCreated =  auctionDAO.save(auction);
         }
         else{
             System.out.println("no se guardo en la blockchain");
         }
-        Auction auctionCreated =  auctionDAO.save(auction);
 
-        return auctionDAO.save(auctionCreated);
+
+        return auctionCreated;
 
     }
 }

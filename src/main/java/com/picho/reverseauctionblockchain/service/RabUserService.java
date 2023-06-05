@@ -12,4 +12,5 @@ public interface RabUserService {
     void addRoleToUser(String username, String roleName);
     RabUser getUser(String username);
     List<RabUser> getUsers();
+    RabUser getRabUserByStateEntityCode(String code);
 }

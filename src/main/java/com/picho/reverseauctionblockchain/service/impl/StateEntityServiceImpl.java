@@ -3,6 +3,7 @@ package com.picho.reverseauctionblockchain.service.impl;
 import com.picho.reverseauctionblockchain.dao.RabUserDAO;
 import com.picho.reverseauctionblockchain.dao.StateEntityDAO;
 import com.picho.reverseauctionblockchain.dto.StateEntityCreateForm;
+import com.picho.reverseauctionblockchain.model.RabUser;
 import com.picho.reverseauctionblockchain.model.StateEntity;
 import com.picho.reverseauctionblockchain.service.StateEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,4 +24,6 @@ public class StateEntityServiceImpl implements StateEntityService {
         return stateEntityDAO.save(stateEntity);
 
     }
+
+
 }
