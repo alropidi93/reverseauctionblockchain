@@ -27,11 +27,13 @@ public class AuctionItem {
     @Column(name = "quantity",  nullable = false)
     private Float quantity ;
 
-    @Column(name = "unity", nullable = false, length = 20)
-    private String unity;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name="idAuction")
     private Auction auction;
+
+    @ManyToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name="idGoodService")
+    private GoodService goodServiceType;
 
 }

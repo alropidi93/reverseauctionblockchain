@@ -33,9 +33,6 @@ public class Auction {
     @Column(name = "referenceValue",  nullable = true)
     private Float referenceValue ;
 
-    @ManyToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name="idGoodService")
-    private GoodService goodService;
 
     @ManyToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name="idStateEntity")

@@ -63,8 +63,13 @@ public class ReverseAuctionController {
             jsonObj =  jsonArray.getJSONObject(i);
             AuctionTestDTO auctionTestDTO =  new AuctionTestDTO();
             auctionTestDTO.setOwner((String)jsonObj.get("Owner"));
-            auctionTestDTO.setGoodServCode((String)jsonObj.get("CodigoBienServicio"));
             auctionTestDTO.setAuctionCode((String)jsonObj.get("CodigoConvocatoria"));
+            JSONArray items = ((JSONArray)jsonObj.get("Items"));
+            JSONObject item= (JSONObject)(items.get(0));
+            auctionTestDTO.setGoodServCode((String)item.get("CodigoBienServicio"));
+
+
+
             myList.add(auctionTestDTO);
 
         }
