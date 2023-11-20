@@ -13,5 +13,8 @@ public interface RabUserDAO extends JpaRepository<RabUser,Long> {
 
     @Query("select ru from RabUser ru where ru.stateEntity.code = :code")
     RabUser findByStateEntityCode(@Param("code") String code);
+
+    @Query("select ru from RabUser ru where ru.bidderEntity.code = :code")
+    RabUser findByBidderEntityCode(@Param("code") String code);
 }
 

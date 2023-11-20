@@ -12,6 +12,16 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GoodService {
+
+    public GoodService(String code, String name, Float unitPrice,String dimension, Integer procurementType){
+
+        this.code = code;
+        this.name = name;
+        this.unitPrice = unitPrice;
+        this.dimension = dimension;
+        this.procurementType = procurementType;
+    }
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "idGoodService", nullable = false)

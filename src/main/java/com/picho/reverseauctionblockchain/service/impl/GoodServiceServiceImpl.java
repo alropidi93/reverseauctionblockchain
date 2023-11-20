@@ -1,7 +1,6 @@
 package com.picho.reverseauctionblockchain.service.impl;
 
 import com.picho.reverseauctionblockchain.dao.GoodServiceDAO;
-import com.picho.reverseauctionblockchain.dao.RoleDAO;
 import com.picho.reverseauctionblockchain.model.GoodService;
 import com.picho.reverseauctionblockchain.service.GoodServiceService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,5 +21,10 @@ public class GoodServiceServiceImpl implements GoodServiceService {
     @Override
     public List<GoodService> getGoodServices() {
         return goodServiceDAO.findAll();
+    }
+
+    @Override
+    public GoodService saveGoodService(GoodService goodService) {
+        return goodServiceDAO.save(goodService);
     }
 }

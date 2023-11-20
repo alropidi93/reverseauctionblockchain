@@ -16,6 +16,14 @@ public class AuctionCreateForm {
     private List<Item> goodServices;
     private String description;
     private Float referenceValue;
+    private String datetimeInitFirstBid;
+    private String datetimeEndFirstBid;
+    private String datetimeInitPriceBid;
+    private String datetimeEndPriceBid;
+    private String datetimeInitBuenaPro;
+    private String datetimeEndBuenaPro;
+    private String datetimeReg;
+
 
     @Data
     @NoArgsConstructor

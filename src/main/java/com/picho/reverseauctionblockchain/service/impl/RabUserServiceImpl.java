@@ -101,6 +101,12 @@ public class RabUserServiceImpl implements RabUserService, UserDetailsService {
     }
 
     @Override
+    public RabUser getRabUserByBidderEntityCode(String code) {
+        RabUser rabUser =  rabUserDAO.findByBidderEntityCode(code);
+        return rabUser;
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         RabUser user = rabUserDAO.findByUsername(username);
         if (user ==  null){

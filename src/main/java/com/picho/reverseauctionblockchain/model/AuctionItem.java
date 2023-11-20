@@ -18,7 +18,7 @@ public class AuctionItem {
     @Column(name = "idAuctionItem", nullable = false)
     private Long idAuctionItem;
 
-    @Column(name = "name", unique = true, nullable = false, length = 300)
+    @Column(name = "name", unique = false, nullable = false, length = 300)
     private String name;
 
     @Column(name = "bestValue",  nullable = true)

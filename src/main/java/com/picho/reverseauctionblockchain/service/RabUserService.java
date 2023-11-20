@@ -13,4 +13,5 @@ public interface RabUserService {
     RabUser getUser(String username);
     List<RabUser> getUsers();
     RabUser getRabUserByStateEntityCode(String code);
+    RabUser getRabUserByBidderEntityCode(String code);
 }

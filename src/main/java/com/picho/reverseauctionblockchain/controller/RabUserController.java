@@ -61,8 +61,6 @@ public class RabUserController {
             entityInfo.setCode(rabUser.getStateEntity().getCode());
             entityInfo.setName(rabUser.getStateEntity().getName());
             ((UserInfoDTO.StateEntityInfo)entityInfo).setDescription(rabUser.getStateEntity().getDescription());
-
-
         }
         else if (rabUser.getBidderEntity() != null){
             userInfoDTO.setRole("ROLE_BIDDER");

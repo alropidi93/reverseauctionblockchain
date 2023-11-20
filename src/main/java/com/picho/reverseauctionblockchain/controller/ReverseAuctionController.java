@@ -1,8 +1,7 @@
 package com.picho.reverseauctionblockchain.controller;
 
-import com.picho.reverseauctionblockchain.dto.AuctionCreateForm;
-import com.picho.reverseauctionblockchain.dto.AuctionTestDTO;
-import com.picho.reverseauctionblockchain.dto.RabUserRegistrationForm;
+import ch.qos.logback.core.joran.action.ActionUtil;
+import com.picho.reverseauctionblockchain.dto.*;
 import com.picho.reverseauctionblockchain.model.Auction;
 import com.picho.reverseauctionblockchain.model.GoodService;
 import com.picho.reverseauctionblockchain.model.RabUser;
@@ -41,8 +40,8 @@ public class ReverseAuctionController {
     @Autowired
     RabUserService rabUserService;
 
-    @GetMapping("/list")
-    public ResponseEntity<List<AuctionTestDTO>> getAuctions() throws IOException, InterruptedException, JSONException {
+    @GetMapping("/listBeta")
+    public ResponseEntity<List<AuctionTestDTO>> getAuctionsBeta() throws IOException, InterruptedException, JSONException {
         String command = "curl -X GET http://localhost:5000/list-auctions -H \"Content-Type: application/json\"";
         ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
         Process pr = processBuilder.start();
@@ -77,6 +76,70 @@ public class ReverseAuctionController {
         return ResponseEntity.ok().body(myList);
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<List<AuctionTestDTO>> getAuctions() throws IOException, InterruptedException, JSONException, URISyntaxException {
+        List<AuctionTestDTO> auctions = auctionService.listAuctions();
+        return ResponseEntity.ok().body(auctions);
+    }
+
+    @GetMapping("/selection/detail/{auctionCode}")
+    public ResponseEntity<AuctionSelectionDetail> getSelectionDetail(@PathVariable String auctionCode) throws JSONException, URISyntaxException, IOException, InterruptedException {
+        AuctionSelectionDetail auctionSelectionDetail  =  auctionService.getAuction(auctionCode);
+        return ResponseEntity.ok().body(auctionSelectionDetail);
+    }
+
+    @GetMapping("/activities/detail/{auctionCode}/{bidderEntityCode}")
+    public ResponseEntity<AuctionActivitiesDetail> getActivitiesDetail(@PathVariable String auctionCode,@PathVariable String bidderEntityCode) throws JSONException, URISyntaxException, IOException, InterruptedException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        RabUser rabUser =  rabUserService.getRabUserByBidderEntityCode(bidderEntityCode);
+        if (rabUser.getUsername().equals(username)){
+            AuctionActivitiesDetail auctionActivitiesDetail  =  auctionService.getAuctionActivities(auctionCode,bidderEntityCode);
+            return ResponseEntity.ok().body(auctionActivitiesDetail);
+        }
+
+        return ResponseEntity.ok().body(null);
+
+    }
+
+    @GetMapping("/firstBid/detail/{auctionCode}/{bidderEntityCode}")
+    public ResponseEntity<AuctionFistBidDetail> getfirstBidDetail(@PathVariable String auctionCode,@PathVariable String bidderEntityCode) throws JSONException, URISyntaxException, IOException, InterruptedException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        RabUser rabUser =  rabUserService.getRabUserByBidderEntityCode(bidderEntityCode);
+        if (rabUser.getUsername().equals(username)){
+            AuctionFistBidDetail auctionFistBidDetail  =  auctionService.getAuctionFirstBid(auctionCode,bidderEntityCode);
+            return ResponseEntity.ok().body(auctionFistBidDetail);
+        }
+
+        return ResponseEntity.ok().body(null);
+
+    }
+
+    @GetMapping("/priceBid/detail/{auctionCode}/{bidderEntityCode}")
+    public ResponseEntity<AuctionPriceBidDetail> getpriceBidDetail(@PathVariable String auctionCode,@PathVariable String bidderEntityCode) throws JSONException, URISyntaxException, IOException, InterruptedException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        RabUser rabUser =  rabUserService.getRabUserByBidderEntityCode(bidderEntityCode);
+        if (rabUser.getUsername().equals(username)){
+            AuctionPriceBidDetail auctionPriceBidDetail  =  auctionService.getAuctionPriceBid(auctionCode,bidderEntityCode);
+            return ResponseEntity.ok().body(auctionPriceBidDetail);
+        }
+
+        return ResponseEntity.ok().body(null);
+
+    }
+
+    @GetMapping("/buenapro/detail/{auctionCode}")
+    public ResponseEntity<List<AuctionBuenaProDetail>> getBuenaproDetail(@PathVariable String auctionCode) throws JSONException, URISyntaxException, IOException, InterruptedException {
+
+
+        List<AuctionBuenaProDetail> auctionBuenaProDetailList  =  auctionService.getAuctionBuenaProInfo(auctionCode);
+        return ResponseEntity.ok().body(auctionBuenaProDetailList);
+
+
+    }
+
     @CrossOrigin
     @PostMapping(value = "/create/{entityCode}")
     public ResponseEntity<Auction>create(@PathVariable String entityCode ,@RequestBody AuctionCreateForm auctionCreateform) throws IOException, InterruptedException, JSONException, URISyntaxException {
@@ -95,6 +158,79 @@ public class ReverseAuctionController {
         return ResponseEntity.created(uri).body(auctionCreated);
     }
 
+    @CrossOrigin
+    @PostMapping(value = "/registerParticipation/{auctionCode}/{bidderEntityCode}")
+    public ResponseEntity<Auction>registerParticipation(@PathVariable String auctionCode ,@PathVariable String bidderEntityCode, @RequestBody AuctionRegisterParticipationForm auctionRegisterParticipationForm) throws IOException, InterruptedException, JSONException, URISyntaxException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        RabUser rabUser =  rabUserService.getRabUserByBidderEntityCode(bidderEntityCode);
+        URI uri = null;
+        if (rabUser.getUsername().equals(username)){
+            uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/reverseauction/registerParticipation").toUriString());
+            Boolean participationFlag =  auctionService.registerBidderParticipation(auctionCode, bidderEntityCode,auctionRegisterParticipationForm.getParticipationRegisterDate());
+            if (participationFlag == null)
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+
+        return ResponseEntity.ok().body(null);
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/registerFirstBid/{auctionCode}/{bidderEntityCode}/{idAuctionItem}")
+    public ResponseEntity<Auction>registerFirstBid(@PathVariable String auctionCode ,@PathVariable String bidderEntityCode,@PathVariable Long idAuctionItem, @RequestBody AuctionRegisterFirstBidForm auctionRegisterFirstBidForm) throws IOException, InterruptedException, JSONException, URISyntaxException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        RabUser rabUser =  rabUserService.getRabUserByBidderEntityCode(bidderEntityCode);
+        URI uri = null;
+        if (rabUser.getUsername().equals(username)){
+            uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/reverseauction/registerFirstBid").toUriString());
+            Boolean firstBidFlag =  auctionService.registerFirstBid(auctionCode, bidderEntityCode,idAuctionItem,auctionRegisterFirstBidForm.getFirstBidRegisterDate(),auctionRegisterFirstBidForm.getFirstBid());
+            if (firstBidFlag == null)
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+
+        return ResponseEntity.ok().body(null);
+    }
+
+
+    @CrossOrigin
+    @PostMapping(value = "/registerPriceBid/{auctionCode}/{bidderEntityCode}/{idAuctionItem}")
+    public ResponseEntity<Auction>registerPriceBid(@PathVariable String auctionCode ,@PathVariable String bidderEntityCode,@PathVariable Long idAuctionItem, @RequestBody AuctionRegisterPriceBidForm auctionRegisterPriceBidForm) throws IOException, InterruptedException, JSONException, URISyntaxException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        //String username ="fake";
+        RabUser rabUser =  rabUserService.getRabUserByBidderEntityCode(bidderEntityCode);
+        URI uri = null;
+        if (rabUser.getUsername().equals(username)){
+            uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/reverseauction/registerPriceBid").toUriString());
+            Boolean firstBidFlag =  auctionService.registerPriceBid(auctionCode, bidderEntityCode,idAuctionItem,auctionRegisterPriceBidForm.getRegDatetime(),auctionRegisterPriceBidForm.getNewBid());
+            if (firstBidFlag == null)
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+
+        return ResponseEntity.ok().body(null);
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/registerBuenaPro/{auctionCode}/{idAuctionItem}")
+    public ResponseEntity<Auction>registerBuenaPro(@PathVariable String auctionCode,@PathVariable  Long idAuctionItem,@RequestBody AuctionRegisterBuenaProForm auctionRegisterBuenaProForm) throws IOException, InterruptedException, JSONException, URISyntaxException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        String usernameDB = auctionService.getStateEntityUsernameByAuctionCode(auctionCode);
+
+        URI uri = null;
+        if (usernameDB.equals(username)){
+            uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/reverseauction/registerBuenaPro").toUriString());
+            Boolean buenaProFlag =  auctionService.registerBuenaPro(auctionCode,idAuctionItem,
+                    auctionRegisterBuenaProForm.getFirstBidderEntityCode(),
+                    auctionRegisterBuenaProForm.getSecondBidderEntityCode(),
+                    auctionRegisterBuenaProForm.getDatetimeReg());
+            //if (firstBidFlag == null)
+            //    return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+
+        return ResponseEntity.ok().body(null);
+    }
     @GetMapping("/getGoodServices")
     public ResponseEntity<List<GoodService>>getGoodServices(){
 

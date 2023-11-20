@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface GoodServiceService {
     List<GoodService> getGoodServices();
+
+    GoodService saveGoodService(GoodService goodService);
 }
